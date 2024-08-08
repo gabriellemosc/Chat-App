@@ -10,7 +10,14 @@
 import flet as ft
 
 def main(pagina):
-    texto = ft.Text("Testando Flask")
+    texto = ft.Text("Gabizap")
+
+    palavras_ofensivas = ["puta", "merda", "porra","caralho","bosta", "cuzao","cu","arrombado","viado","bixa","vadia","vagabunda"]
+
+    def filtrar_palavras(mensagem):
+            for palavra in palavras_ofensivas:
+              mensagem = mensagem.replace(palavra, "***")
+            return mensagem 
 
     #Criando o chat
     chat = ft.Column()
@@ -23,7 +30,7 @@ def main(pagina):
     def enviar_mensagem_tunel(mensagem):
         tipo = mensagem["tipo"]
         if tipo == "mensagem":
-            texto_mensagem = mensagem["texto"]
+            texto_mensagem = filtrar_palavras(mensagem["texto"])
             usuario_mensagem = mensagem["usuario"]
             #Add mensagem no chat
             chat.controls.append(ft.Text(f"{usuario_mensagem}: {texto_mensagem}")) #Adiciona o valor do campo mensagem, na coluna chat para todos. Com nome e mensagem do user
@@ -38,6 +45,7 @@ def main(pagina):
 
     #Envia a mensagem, para o túnel de todos
     def enviar_mensagem(evento):
+        campo_mensagem.value = filtrar_palavras(campo_mensagem.value)  # Filtra a mensagem
         pagina.pubsub.send_all({"texto":campo_mensagem.value, "usuario": nome_usuario.value, "tipo": "mensagem"}) #Enviar pro tunel, tanto a mensagem e o nome do usuario
         #limpar campo de mensagem
         campo_mensagem.value = '' #Depois limpamos a caixa de texto
